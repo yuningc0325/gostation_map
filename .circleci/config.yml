@@ -1,0 +1,66 @@
+viesion: 2.1
+jobs:
+  setup:
+    docker:
+      - image: circleci/node:12.8.1
+    working_directory: ~/app
+    steps:
+      - checkout
+      - run: 
+          name: print setting env
+          command: |
+            echo 'Docker container setup under' $PWD
+            echo 'Node version' && node -v 
+            echo 'Yarn version' && yarn -v
+            printenv
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-package-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Dependencies
+          command: yarn install --forzen-lockfile
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-package-{{ checksum "yarn.lock" }}   
+          paths:
+            - node_modules
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/app
+  build_production:
+    docker:
+      - image: circleci/node:12.8.1
+    working_directory: ~/app
+    steps:  
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          name: Restore Yarna Cache
+          key: yarn-package-{{ checksum "yarn.lock" }}
+      - run:
+          name: Build and Deploy
+          command: |
+           sudo curl -O https://bootstrap.pypa.io/get-pip.py
+           sudo python get-pip.py
+           sudo pip install awscli --upgrade
+           yarn run clean && yarn run build && yarn run deploy --y
+
+workflows:
+  version: 2
+  build_master:
+    jobs:
+      - setup:
+          filters:
+            branches:
+              only:
+                - master
+      - build_production:
+          requires:
+            - setup
+          filters:
+            branches:
+              only:
+                - master
+          
