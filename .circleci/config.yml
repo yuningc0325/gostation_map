@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Build and Deploy
           command: |
-           sudo curl -O https://bootstrap.pypa.io/get-pip.py
+           sudo curl -O https://bootstrap.pypa.io/pip/3.5/get-pip.py
            sudo python3 get-pip.py
            sudo pip install awscli  --upgrade
            yarn run clean && yarn run build && yarn run deploy --y
