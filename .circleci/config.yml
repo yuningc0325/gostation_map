@@ -48,7 +48,7 @@ jobs:
            sudo curl -O https://bootstrap.pypa.io/pip/3.5/get-pip.py
            sudo python3 get-pip.py
            sudo pip install awscli  --upgrade
-           yarn run build && yarn run deploy --y
+           yarn run build && yarn run deploy
 
 workflows:
   version: 2
