@@ -20,6 +20,9 @@ jobs:
       - run:
           name: Install Dependencies
           command: yarn install --forzen-lockfile
+      - run:
+          name: App and Unit Test
+          command: yarn run test
       - save_cache:
           name: Save Yarn Package Cache
           key: yarn-package-{{ checksum "yarn.lock" }}   
@@ -29,16 +32,7 @@ jobs:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/app
-  test:
-    docker:
-      - image: circleci/node:12.8.1
-    working_directory: ~/app
-    steps:
-      - run:
-          name: Test Code
-          command: |
-           yarn run test
-  build_production:
+  build_and_deploy:
     docker:
       - image: circleci/node:12.8.1
     working_directory: ~/app
@@ -58,15 +52,12 @@ jobs:
 
 workflows:
   version: 2
-  build_master:
+  ciflow:
     jobs:
       - setup:
-      - test:
+      - build_and_deploy:
           requires:
             - setup
-      - build_production:
-          requires:
-            - test
           filters:
             branches:
               only:
