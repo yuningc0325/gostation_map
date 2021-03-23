@@ -29,6 +29,15 @@ jobs:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/app
+  test:
+    docker:
+      - image: circleci/node:12.8.1
+    working_directory: ~/app
+    steps:
+      - run:
+          name: Test Code
+          command: |
+           yarn run test
   build_production:
     docker:
       - image: circleci/node:12.8.1
@@ -43,8 +52,8 @@ jobs:
           name: Build and Deploy
           command: |
            sudo curl -O https://bootstrap.pypa.io/get-pip.py
-           sudo python get-pip.py
-           sudo pip install awscli --upgrade
+           sudo python3 get-pip.py
+           sudo pip install awscli  --upgrade
            yarn run clean && yarn run build && yarn run deploy --y
 
 workflows:
@@ -52,13 +61,12 @@ workflows:
   build_master:
     jobs:
       - setup:
-          filters:
-            branches:
-              only:
-                - master
-      - build_production:
+      - test:
           requires:
             - setup
+      - build_production:
+          requires:
+            - test
           filters:
             branches:
               only:
