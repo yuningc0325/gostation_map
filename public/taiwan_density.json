@@ -1,0 +1,122 @@
+[
+  {
+    "name": "新北市",
+    "population": 4,
+    "area": "030",
+    "population_density": 954
+  },
+  {
+    "name": "臺北市",
+    "population": 2,
+    "area": 602,
+    "population_density": 418
+  },
+  {
+    "name": "桃園市",
+    "population": 2,
+    "area": 268,
+    "population_density": 807
+  },
+  {
+    "name": "臺中市",
+    "population": 2,
+    "area": 820,
+    "population_density": 787
+  },
+  {
+    "name": "臺南市",
+    "population": 1,
+    "area": 874,
+    "population_density": 917
+  },
+  {
+    "name": "高雄市",
+    "population": 2,
+    "area": 765,
+    "population_density": 932
+  },
+  {
+    "name": "宜蘭縣",
+    "population": 453,
+    "area": "087",
+    "population_density": 2
+  },
+  {
+    "name": "新竹縣",
+    "population": 570,
+    "area": 775,
+    "population_density": 1
+  },
+  {
+    "name": "苗栗縣",
+    "population": 542,
+    "area": 590,
+    "population_density": 1
+  },
+  {
+    "name": "彰化縣",
+    "population": 1,
+    "area": 266,
+    "population_density": 670
+  },
+  {
+    "name": "南投縣",
+    "population": 490,
+    "area": 832,
+    "population_density": 4
+  },
+  {
+    "name": "雲林縣",
+    "population": 676,
+    "area": 873,
+    "population_density": 1
+  },
+  {
+    "name": "嘉義縣",
+    "population": 499,
+    "area": 481,
+    "population_density": 1
+  },
+  {
+    "name": "屏東縣",
+    "population": 812,
+    "area": 658,
+    "population_density": 2
+  },
+  {
+    "name": "臺東縣",
+    "population": 215,
+    "area": 261,
+    "population_density": 3
+  },
+  {
+    "name": "花蓮縣",
+    "population": 324,
+    "area": 372,
+    "population_density": 4
+  },
+  {
+    "name": "澎湖縣",
+    "population": 105,
+    "area": 952,
+    "population_density": 126.8641
+  },
+  {
+    "name": "基隆市",
+    "population": 367,
+    "area": 577,
+    "population_density": 132.7589
+  },
+  {
+    "name": "新竹市",
+    "population": 451,
+    "area": 412,
+    "population_density": 104.1526
+  },
+  {
+    "name": "嘉義市",
+    "population": 266,
+    "area": "005",
+    "population_density": 60.0256
+  }
+]

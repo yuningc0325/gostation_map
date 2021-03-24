@@ -1,0 +1,60 @@
+[
+  {
+    "Id": "865A6D73-AB7D-4176-A542-09898FBF7DCA",
+    "LocName": {
+      "List": [
+        {
+          "Value": "Gogoro Huwei Guangfu RS Center",
+          "Lang": "en-US"
+        },
+        {
+          "Value": "Gogoro 虎尾光復門市站",
+          "Lang": "zh-TW"
+        }
+      ]
+    },
+    "Latitude": 23.711194,
+    "Longitude": 120.433871,
+    "ZipCode": 63244,
+    "Address": {
+      "List": [
+        {
+          "Value": "No. 478, Guangfu Rd., Huwei Township, Yunlin County",
+          "Lang": "en-US"
+        },
+        {
+          "Value": "雲林縣虎尾鎮光復路478號(近光復路/新興路口)",
+          "Lang": "zh-TW"
+        }
+      ]
+    },
+    "District": {
+      "List": [
+        {
+          "Value": "Huwei Township",
+          "Lang": "en-US"
+        },
+        {
+          "Value": "虎尾鎮",
+          "Lang": "zh-TW"
+        }
+      ]
+    },
+    "City": {
+      "List": [
+        {
+          "Value": "Yunlin County",
+          "Lang": "en-US"
+        },
+        {
+          "Value": "雲林縣",
+          "Lang": "zh-TW"
+        }
+      ]
+    },
+    "AvailableTimeByte": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "State": 1,
+    "StorePhoto": "['https://cdn.gogoro.com/resources/images/gostations/TW6324401A_01.jpg', 'https://cdn.gogoro.com/resources/images/gostations/TW6324401A_02.jpg', 'https://cdn.gogoro.com/resources/images/gostations/TW6324401A_03.jpg']",
+    "RId": "TW6324401A"
+  }
+]
