@@ -12,7 +12,6 @@ jobs:
             echo 'Docker container setup under' $PWD
             echo 'Node version' && node -v 
             echo 'Yarn version' && yarn -v
-            CI=false
             printenv
       - restore_cache:
           name: Restore Yarn Package Cache

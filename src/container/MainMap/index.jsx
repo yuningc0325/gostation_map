@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import MapGL, { Marker, Source, Layer, Popup, NavigationControl } from 'react-map-gl'
+import React, { useEffect, useState } from 'react'
+import MapGL, { Source, Layer, Popup, NavigationControl } from 'react-map-gl'
 import { Card, Skeleton, Typography } from 'antd'
 import FlexBox from '../../styledComponent/FlexBox'
 import FullPageSpin from '../../component/FullPageSpin'
 import { getSecondItemFromArray, countby } from '../../utils'
 import axios from 'axios'
-import logoSVG from '../../logo.svg'
+// import logoSVG from '../../logo.svg'
 import logoPng from '../../logo.png'
 import { CardStyle } from './style'
 
@@ -33,17 +33,17 @@ const layerStyle = {
   }
 }
 
-const StaionMarker = React.memo(({ arr }) => {
-  return arr.map(station => (
-    <Marker
-      key={station.rid}
-      latitude={station.latitude}
-      longitude={station.longitude}
-    >
-      <img style={{ zIndex: 999, width: 30, height: 30 }} src={logoSVG} />
-    </Marker>
-  ))
-})
+// const StaionMarker = React.memo(({ arr }) => {
+//   return arr.map(station => (
+//     <Marker
+//       key={station.rid}
+//       latitude={station.latitude}
+//       longitude={station.longitude}
+//     >
+//       <img style={{ zIndex: 999, width: 30, height: 30 }} src={logoSVG} />
+//     </Marker>
+//   ))
+// })
 
 const TaiwanMap = () => {
   const geoJson = {
@@ -64,10 +64,6 @@ const TaiwanMap = () => {
   const _mapRef = React.createRef()
 
   useEffect(() => {
-    fetchData()
-  }, [])
-
-  useEffect(() => {
     if (_mapRef.current === null) return
     const map = _mapRef.current.getMap()
     // let img = new Image(20,20)
@@ -77,12 +73,10 @@ const TaiwanMap = () => {
         throw Error('map load error')
       }
       if (!map.hasImage('go-station')) {
-        map.addImage('go-station', image, false)
+        map.addImage('go-station', image, {alt:'logo'}, false)
       }
       // img.src = logoSVG
     })
-    map.on('mousemove', e => console.log(e))
-    console.log(map)
   }, [_mapRef])
 
   const parseStationData = (arr) => {
@@ -108,65 +102,63 @@ const TaiwanMap = () => {
     }).filter(dt => dt.state === '啟用中')
   }
 
-  const fetchData = async () => {
-    let result = []
-    let aggrData = []
-    try {
-      const res = await axios.get('https://webapi.gogoro.com/api/vm/list')
-      const twJson = await axios.get('taiwan_density.json')
-      const { data: cityData } = twJson
-      const { data: stationGeoJson } = res
-      // log data
-      result = parseStationData(stationGeoJson)
-      // aggr data
-      const resultInGroup = countby(result, 'city_en')
-
-      aggrData = cityData.map(dt => {
-        if (!resultInGroup[dt.city]) return {}
-        const {
-          count: station_count,
-          ratio: station_ratio
-        } = resultInGroup[dt.city][0]
-        return {
-          ...dt,
-          station_density: station_count ? (station_count / dt.area) : 0,
-          station_count,
-          station_ratio
-        }
-      }).filter(dt => Object.values(dt).length > 0)
-
-    } catch (err) {
-      console.log(err)
-      alert('Something Went Wrong')
-    }
-    const newGeo = {
-      type: 'FeatureCollection',
-      features: result.map(dt =>
-      ({
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [dt.longitude, dt.latitude] },
-        properties: { ...dt }
-      })
-      )
-    }
-    setStationGeoJson(newGeo)
-    setStatistic(aggrData)
-    setIsLoading(false)
-  }
-
   useEffect(() => {
+    const fetchData = async () => {
+      let result = []
+      let aggrData = []
+      try {
+        const res = await axios.get('https://webapi.gogoro.com/api/vm/list')
+        const twJson = await axios.get('taiwan_density.json')
+        const { data: cityData } = twJson
+        const { data: stationGeoJson } = res
+        // log data
+        result = parseStationData(stationGeoJson)
+        // aggr data
+        const resultInGroup = countby(result, 'city_en')
+  
+        aggrData = cityData.map(dt => {
+          if (!resultInGroup[dt.city]) return {}
+          const {
+            count: station_count,
+            ratio: station_ratio
+          } = resultInGroup[dt.city][0]
+          return {
+            ...dt,
+            station_density: station_count ? (station_count / dt.area) : 0,
+            station_count,
+            station_ratio
+          }
+        }).filter(dt => Object.values(dt).length > 0)
+  
+      } catch (err) {
+        console.log(err)
+        alert('Something Went Wrong')
+      }
+      const newGeo = {
+        type: 'FeatureCollection',
+        features: result.map(dt =>
+        ({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [dt.longitude, dt.latitude] },
+          properties: { ...dt }
+        })
+        )
+      }
+      setStationGeoJson(newGeo)
+      setStatistic(aggrData)
+      setIsLoading(false)
+    }
     fetchData()
   }, [])
 
   const onHover = (eve) => {
-    const { features, srcEvent: {offsetX, offsetY} } = eve
+    const { features } = eve
     const hoveredFeature = features && features[0]
     setPopupInfo(null)
     if(!hoveredFeature) return
     const { properties } = hoveredFeature
     const hasInfo = properties && properties.type === 'feature_gostation'
     if(!hasInfo) return 
-    console.log(properties)
     setPopupInfo(properties)
     // const currentFeature =   hoveredFeature
     // ? {
