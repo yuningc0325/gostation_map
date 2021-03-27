@@ -1,10 +1,10 @@
-import TaiwanMap from './container/TaiwanMap'
+import MainMap from './container/MainMap'
 import './App.css'
 
 function App() {
   return (
     <div className="App">
-      <TaiwanMap/>
+      <MainMap/>
     </div>
   );
 }

@@ -5,6 +5,7 @@ const FlexBox = (
   {
     justifyContent = 'center',
     alignItems = 'center',
+    flexDirection='row',
     width = 'auto',
     height = 'auto',
     children
@@ -14,9 +15,10 @@ const FlexBox = (
     <div style={{
       display: 'flex',
       justifyContent,
+      flexDirection,
       alignItems,
       width,
-      height
+      height,
     }}>
       {children}
     </div>
@@ -26,6 +28,7 @@ const FlexBox = (
 FlexBox.propTypes = {
   justifyContent: PropTypes.string,
   alignItems: PropTypes.string,
+  flexDirection: PropTypes.string,
   width: PropTypes.string,
   height: PropTypes.string,
   children: PropTypes.node
@@ -34,6 +37,7 @@ FlexBox.propTypes = {
 FlexBox.defaultProps = {
   justifyContent: 'center',
   alignItems: 'center',
+  flexDirection: 'column',
   width: 'auto',
   height: 'auto',
   children: () => {<></>}
