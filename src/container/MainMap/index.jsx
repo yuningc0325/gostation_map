@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import ReactMapGL, { Marker, Source, Layer, Popup } from 'react-map-gl'
+import MapGL, { Marker, Source, Layer, Popup, NavigationControl } from 'react-map-gl'
 import { Card, Skeleton, Typography } from 'antd'
 import FlexBox from '../../styledComponent/FlexBox'
 import FullPageSpin from '../../component/FullPageSpin'
@@ -8,8 +8,6 @@ import axios from 'axios'
 import logoSVG from '../../logo.svg'
 import logoPng from '../../logo.png'
 import { CardStyle } from './style'
-import MapController from './my-map-controller.js'
-import { noop } from 'lodash'
 
 // 打點
 // https://docs.mapbox.com/mapbox-gl-js/example/filter-features-within-map-view/
@@ -23,6 +21,16 @@ const stateMapping = {
   1: '啟用中',
   98: '維修中',
   99: '測試中',
+}
+
+const layerStyle = {
+  'id': 'gostation_point',
+  'source': 'point',
+  'type': 'symbol',
+  'layout': {
+    'icon-image': 'go-station',
+    'icon-allow-overlap': false
+  }
 }
 
 const StaionMarker = React.memo(({ arr }) => {
@@ -54,7 +62,6 @@ const TaiwanMap = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [popupInfo, setPopupInfo] = useState(null)
   const _mapRef = React.createRef()
-  const controller = new MapController();
 
   useEffect(() => {
     fetchData()
@@ -77,6 +84,29 @@ const TaiwanMap = () => {
     map.on('mousemove', e => console.log(e))
     console.log(map)
   }, [_mapRef])
+
+  const parseStationData = (arr) => {
+    return arr.map(dt => {
+      const address = getSecondItemFromArray(JSON.parse(dt.Address)['List'])['Value']
+      const city = getSecondItemFromArray(JSON.parse(dt.City)['List'])['Value']
+      const district = getSecondItemFromArray(JSON.parse(dt.District)['List'])['Value']
+      const locName = getSecondItemFromArray(JSON.parse(dt.LocName)['List'])['Value']
+      return {
+        id: dt.Id,
+        latitude: dt.Latitude,
+        longitude: dt.Longitude,
+        zipCode: dt.ZipCode,
+        address,
+        city,
+        city_en: JSON.parse(dt.City)['List'][0]['Value'],
+        district,
+        locName,
+        stateCode: dt.State,
+        state: stateMapping[dt.State],
+        type: 'feature_gostation'
+      }
+    }).filter(dt => dt.state === '啟用中')
+  }
 
   const fetchData = async () => {
     let result = []
@@ -124,39 +154,9 @@ const TaiwanMap = () => {
     setIsLoading(false)
   }
 
-
-  const parseStationData = (arr) => {
-    return arr.map(dt => {
-      const address = getSecondItemFromArray(JSON.parse(dt.Address)['List'])['Value']
-      const city = getSecondItemFromArray(JSON.parse(dt.City)['List'])['Value']
-      const district = getSecondItemFromArray(JSON.parse(dt.District)['List'])['Value']
-      const locName = getSecondItemFromArray(JSON.parse(dt.LocName)['List'])['Value']
-      return {
-        id: dt.Id,
-        latitude: dt.Latitude,
-        longitude: dt.Longitude,
-        zipCode: dt.ZipCode,
-        address,
-        city,
-        city_en: JSON.parse(dt.City)['List'][0]['Value'],
-        district,
-        locName,
-        stateCode: dt.State,
-        state: stateMapping[dt.State],
-        type: 'feature_gostation'
-      }
-    }).filter(dt => dt.state === '啟用中')
-  }
-
-  const layerStyle = {
-    'id': 'gostation_point',
-    'source': 'point',
-    'type': 'symbol',
-    'layout': {
-      'icon-image': 'go-station',
-      'icon-allow-overlap': false
-    }
-  }
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   const onHover = (eve) => {
     const { features, srcEvent: {offsetX, offsetY} } = eve
@@ -188,7 +188,7 @@ const TaiwanMap = () => {
         </Skeleton>
       </Card>
       {isLoading ? (<FullPageSpin />) :
-        <ReactMapGL
+        <MapGL
           ref={_mapRef}
           // controller={controller}
           {...viewport}
@@ -201,6 +201,7 @@ const TaiwanMap = () => {
           <Source id='station_mark' type='geojson' data={stationGeoJson}>
             <Layer {...layerStyle} />
           </Source>
+          <NavigationControl />
           {popupInfo &&
             <Popup
             latitude={popupInfo.latitude}
@@ -222,7 +223,7 @@ const TaiwanMap = () => {
               </FlexBox>
             </Popup>
           }
-        </ReactMapGL>
+        </MapGL>
       }
     </>
 
