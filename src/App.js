@@ -1,5 +1,5 @@
 import MainMap from './container/MainMap'
-import Canvas from './container/D3Test'
+import Canvas from './component/MetrixChart'
 import './App.css'
 
 function App() {

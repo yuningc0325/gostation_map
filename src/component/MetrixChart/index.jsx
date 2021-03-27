@@ -6,7 +6,7 @@ import { createViewBox, getColorByDist, clearViewBox } from '../../utils/d3-cont
 import * as d3 from 'd3'
 import FlexBox from '../../styledComponent/FlexBox'
 
-const Canvas = ({ dataset }) => {
+const MetrixChart = ({ dataset }) => {
   const [d3View, setd3View] = useState(null)
   useEffect(() => {
     const viewbox = createViewBox('go-scatter-plot', [25, 10, 60, 40])
@@ -123,11 +123,11 @@ const Canvas = ({ dataset }) => {
   )
 }
 
-Canvas.propTypes = {
+MetrixChart.propTypes = {
   dataset: PropTypes.any
 }
 
-Canvas.defaultProps = {
+MetrixChart.defaultProps = {
   dataset: [
     { 'city': 'Changhua County', 'x': 0.0698066634648677, 'y': 1179, 'size': 75, isSelected: false },
     { 'city': 'Chiayi City', 'x': 0.4164889647083911, 'y': 4432, 'size': 25, isSelected: false },
@@ -152,4 +152,4 @@ Canvas.defaultProps = {
   ]
 }
 
-export default Canvas
+export default MetrixChart

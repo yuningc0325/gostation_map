@@ -55,7 +55,8 @@ const TaiwanMap = () => {
     height: '100vh',
     latitude: 23.6978,
     longitude: 120.9605,
-    zoom: 8
+    zoom: 8,
+    minZoom: 8
   })
   const [stationGeoJson, setStationGeoJson] = useState(geoJson)
   const [statistic, setStatistic] = useState([])
