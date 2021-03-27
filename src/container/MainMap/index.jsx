@@ -145,6 +145,7 @@ const TaiwanMap = () => {
         )
       }
       setStationGeoJson(newGeo)
+      console.log(aggrData)
       setStatistic(aggrData)
       setIsLoading(false)
     }
