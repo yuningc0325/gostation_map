@@ -241,7 +241,7 @@ const TaiwanMap = (props) => {
           // controller={controller}
           {...viewport}
           mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-          mapStyle='mapbox://styles/yuningc0325/ckmnpe5yalnt817tfwbuf5yeu?optimize=true'
+          // mapStyle='mapbox://styles/yuningc0325/ckmnpe5yalnt817tfwbuf5yeu?optimize=true'
           onViewportChange={nextViewport => setViewport(nextViewport)}
           onHover={eve => onHover(eve)}
           onClick={onClick}
