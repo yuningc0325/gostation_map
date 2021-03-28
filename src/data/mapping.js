@@ -10,7 +10,6 @@ export const g0vCityMapping = {
     "苗栗縣": "Miaoli County",
     "彰化縣": "Changhua County",
     "南投縣": "Nantou County",
-    "宜蘭縣": "Yunlin County",
     "嘉義縣": "Chiayi County",
     "屏東縣": "Pingtung County",
     "台東縣": "Taitung County",

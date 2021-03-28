@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import MapGL, { Source, Layer, Popup, NavigationControl } from 'react-map-gl'
+import MapGL, { Source, Layer, Popup, NavigationControl, FlyToInterpolator } from 'react-map-gl'
 import FlexBox from '../../styledComponent/FlexBox'
 import FullPageSpin from '../../component/FullPageSpin'
 import { getSecondItemFromArray, countby, getQuadrantByMean } from '../../utils'
 import { g0vCityMapping } from '../../data/mapping'
 import axios from 'axios'
-import { meanBy } from 'lodash'
+import { meanBy, property } from 'lodash'
 import logoPng from '../../logo.png'
 import { connect } from 'react-redux'
 import { setIsLoading } from '../../reducer/controller'
@@ -58,11 +58,6 @@ const cityLayerStyle = {
 }
 
 const TaiwanMap = (props) => {
-  const {
-    setIsLoading: _setIsLoading,
-    setStatistic: _setStatistic,
-    setCurrentCity: _setCurrentCity
-  } = props
   const geoJson = {
     type: 'FeatureCollection',
     features: []
@@ -77,7 +72,6 @@ const TaiwanMap = (props) => {
   })
   const [stationGeoJson, setStationGeoJson] = useState(geoJson)
   const [cityGeoJson, setCityGeoJson] = useState(geoJson)
-  const [statistic, setStatistic] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [popupInfo, setPopupInfo] = useState(null)
   const _mapRef = React.createRef()
@@ -121,6 +115,7 @@ const TaiwanMap = (props) => {
   }
 
   useEffect(() => {
+    const { setIsLoading: _setIsLoading, setStatistic: _setStatistic } = props
     const fetchData = async () => {
       let result = []
       let aggrData = []
@@ -188,7 +183,7 @@ const TaiwanMap = (props) => {
 
       const featuresWithQuadrant = cityGeoLayer.features.map(dt => {
         let quadrant = 0
-        const filterData = metricData.filter(o => o.name == dt.properties.name)
+        const filterData = metricData.filter(o => o.name === dt.properties.name)
         if (filterData.length !== 0) quadrant = filterData[0]['quadrant']
         return ({
           ...dt,
@@ -202,7 +197,6 @@ const TaiwanMap = (props) => {
 
       setStationGeoJson(newGeo)
       setCityGeoJson(cityGeoLayer)
-      setStatistic(metricData)
       setIsLoading(false)
       // reducer set
       _setIsLoading(false)
@@ -229,8 +223,14 @@ const TaiwanMap = (props) => {
     const { properties, layer } = hoveredFeature
     if (!layer) return
     if (layer.id !== 'city-layer') return
-    console.log(properties)
-    _setCurrentCity({value: properties.name, name: properties.COUNTYNAME})
+    props.setCurrentCity({ value: properties.name, name: properties.COUNTYNAME })
+    setViewport({
+      longitude: eve.lngLat[0],
+      latitude: eve.lngLat[1],
+      zoom: 12,
+      transitionInterpolator: new FlyToInterpolator({speed: 1.2}),
+      transitionDuration: 'auto'
+    })
   }
 
   return (

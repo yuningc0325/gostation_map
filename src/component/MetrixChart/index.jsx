@@ -13,10 +13,9 @@ const Info = props => {
   if (dataset.length === 0 || !city) return <></>
 
   const name = city.name
-  const countFilter = dataset.filter(dt => dt.name === city.value)[0]
-  const ratioFilter = dataset.filter(dt => dt.name === city.value)[0]
-  const count = countFilter ? countFilter['size'] : 0
-  const ratio = countFilter ? countFilter['size_ratio'] : 0
+  const filteredArr = dataset.filter(dt => dt.name === city.value)[0]
+  const count = filteredArr ? filteredArr['size'] : 0
+  const ratio = filteredArr ? filteredArr['size_ratio'] : 0
   return (
     <>
       <h3>{name}</h3>
@@ -34,20 +33,16 @@ const MetrixChart = props => {
 
   const [d3View, setd3View] = useState(null)
   useEffect(() => {
-    initViewBox()
-  }, [])
-
-  const initViewBox = () => {
     const viewbox = createViewBox('go-scatter-plot', [25, 10, 60, 40])
     viewbox.svg.append('svg').attr('id', viewbox.svgId)
     setd3View(viewbox)
-  }
-
+  }, [])
+  
   useEffect(() => {
     if (!dataset || !d3View) return
     if (dataset.length === 0) return
     // draw
-    const { id, svgId, width, height, margin, svg } = d3View
+    const { svgId, width, height, margin, svg } = d3View
     // console.log('d3 currentCity.value' ,currentCity.value)
     clearViewBox(svgId)
     const _svg = svg.append('svg').attr('id', svgId)
@@ -63,9 +58,6 @@ const MetrixChart = props => {
     const yScale = d3.scaleLinear()
       .domain(d3.extent(dataset, d => d['y']))
       .range([height - margin[2], margin[0]])
-    const sizeScale = d3.scaleLinear()
-      .domain(d3.extent(dataset, d => d['size']))
-      .range([margin[3], width - margin[1]])
     const xAxis = d3.axisBottom(xScale).ticks()
     const yAxis = d3.axisLeft(yScale).ticks().tickFormat(d3.format(".0s"))
     // create x
