@@ -39,7 +39,7 @@ const MetrixChart = props => {
   }, [])
   
   useEffect(() => {
-    if (!dataset || !d3View) return
+    if (!dataset) return
     if (dataset.length === 0) return
     // draw
     const { svgId, width, height, margin, svg } = d3View
@@ -121,7 +121,7 @@ const MetrixChart = props => {
       .attr("fill", d => getCustomedColor(d.quadrant, d.name === currentCity.value))
       .attr('stroke', 'currentBlack')
 
-  }, [dataset, currentCity.value])
+  }, [d3View, dataset, currentCity.value])
 
 
   return (

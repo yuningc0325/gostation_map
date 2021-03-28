@@ -5,7 +5,7 @@ import FullPageSpin from '../../component/FullPageSpin'
 import { getSecondItemFromArray, countby, getQuadrantByMean } from '../../utils'
 import { g0vCityMapping } from '../../data/mapping'
 import axios from 'axios'
-import { meanBy, property } from 'lodash'
+import { meanBy } from 'lodash'
 import logoPng from '../../logo.png'
 import { connect } from 'react-redux'
 import { setIsLoading } from '../../reducer/controller'
@@ -203,7 +203,7 @@ const TaiwanMap = (props) => {
       _setStatistic(metricData)
     }
     fetchData()
-  }, [])
+  }, [props])
 
   const onHover = (eve) => {
     const { features } = eve
@@ -240,7 +240,7 @@ const TaiwanMap = (props) => {
           ref={_mapRef}
           // controller={controller}
           {...viewport}
-          // mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+          mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
           mapStyle='mapbox://styles/yuningc0325/ckmnpe5yalnt817tfwbuf5yeu?optimize=true'
           onViewportChange={nextViewport => setViewport(nextViewport)}
           onHover={eve => onHover(eve)}
