@@ -3,11 +3,10 @@ const SET_CURRENT_CITY = 'SET_CURRENT_CITY'
 
 const initialState = {
   statistic: [],
-  currentCity: {name:'', value:''}
+  currentCity: {name:'台北市', value:'Taipei City'}
 }
 
 export const setStatistic = (payload = initialState) => dispatch => {
-  console.log('*** payload', payload)
   if (payload !== null) {
     if (payload.length > 0) {
       dispatch({ type: SET_STATISTIC_DATA, payload: { statistic: payload } })

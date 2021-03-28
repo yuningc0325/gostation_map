@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Card, Skeleton, Typography } from 'antd'
-import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import FixedWrapper from '../../styledComponent/FixedWrapper'
 
-const BigNumber = ({ dataset }) => {
-  useEffect(() => {
-    setIsLoading(false)
-  }, [])
-  const [isLoading, setIsLoading] = useState(true)
+const BigNumber = ({ dashboard, controller }) => {
+  const { isLoading } = controller
+  const { statistic } = dashboard
   return (
     <FixedWrapper right={10} top={10} width='200px' hieght='75px'>
       <Card width='100%'>
         <Skeleton loading={isLoading} paragraph={{ rows: 1 }}>
           <Typography>總站數:
-          <span>{dataset.reduce((pre, cur) => pre + cur.size, 0)}</span>
+          <span>{statistic.length > 0 ? statistic.reduce((pre, cur) => pre + cur.size, 0) : 0}</span>
           </Typography>
         </Skeleton>
       </Card>
@@ -21,14 +19,4 @@ const BigNumber = ({ dataset }) => {
   )
 }
 
-BigNumber.propTypes = {
-  dataset: PropTypes.arrayOf(PropTypes.instanceOf({
-    size: PropTypes.number.isRequired
-  }))
-}
-
-BigNumber.defaultProps = {
-  dataset: [{ size: 0 }]
-}
-
-export default BigNumber
+export default connect(({ dashboard, controller }) => ({ dashboard, controller }))(BigNumber)

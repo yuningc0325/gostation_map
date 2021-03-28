@@ -181,7 +181,8 @@ const TaiwanMap = (props) => {
           size: dt.station_count,
           x: dt.station_density,
           y: dt.population_density,
-          quadrant
+          size_ratio: dt.station_ratio,
+          quadrant,
         }
       })
 

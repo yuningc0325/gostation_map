@@ -15,7 +15,10 @@ const setDomWithProps =
 
 // set viewbox to show chart under svg area 
 const setViewBox = (ele) => {
-  const svg = d3.select(`#${ele.id}`).append('svg').attr('viewBox', [0, 0, ele.width, ele.height])
+  const svg = d3.select(`#${ele.id}`)
+  .append('svg')
+  .attr('viewBox', [0, 0, ele.width, ele.height])
+  .attr('id', `${ele.id + '_viewbox'}`)
   const newEle = Object.assign({}, ele)
   newEle.svg = svg
   return newEle
@@ -27,24 +30,16 @@ export const clearViewBox = (id) => {
   d3.select(`#${id}`).remove()
 }
 
-export const getColorByDist = (x, y, x_mean, y_mean) => {
+// get color by quadrant and isSelected
+// if this node is selected than return deeper color
+export const getCustomedColor = (quadrant = 0, isSelected) => {
   // green , red, orange, yellow
   const colorScheme = {
-    tr: 'rgba(13,157,3,0.5)',
-    tl: 'rgba(250,51,51,0.5)',
-    bl: 'rgba(255,172,68,0.5)',
-    br: 'rgba(250,234,51,0.5)'
+    0: 'rgb(255,255,255,%%opc%%)',
+    1: 'rgba(13,157,3,%%opc%%)',
+    2: 'rgba(250,51,51,%%opc%%)',
+    3: 'rgba(255,172,68,%%opc%%)',
+    4: 'rgba(250,234,51,%%opc%%)'
   }
-  
-  if(x >= x_mean && y >= y_mean) {
-    return colorScheme['tr']
-  } else if (x < x_mean && y >= y_mean){
-    return colorScheme['tl']
-  } else if (x < x_mean && y < y_mean){
-    return colorScheme['bl']
-  } else if (x >= x_mean && y < y_mean) {
-    return colorScheme['br']
-  } else {
-    return colorScheme['tl']
-  }
+  return colorScheme[quadrant].replace('%%opc%%', isSelected ? '0.9' : '0.1')
 }
