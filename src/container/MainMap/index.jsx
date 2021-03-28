@@ -1,29 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import MapGL, { Source, Layer, Popup, NavigationControl } from 'react-map-gl'
-import { Card, Skeleton, Typography } from 'antd'
 import FlexBox from '../../styledComponent/FlexBox'
 import FullPageSpin from '../../component/FullPageSpin'
-import { getSecondItemFromArray, countby } from '../../utils'
+import { getSecondItemFromArray, countby, getQuadrantByMean } from '../../utils'
+import { g0vCityMapping } from '../../data/mapping'
 import axios from 'axios'
-// import logoSVG from '../../logo.svg'
+import { meanBy } from 'lodash'
 import logoPng from '../../logo.png'
-import { CardStyle } from './style'
 
-// 打點
-// https://docs.mapbox.com/mapbox-gl-js/example/filter-features-within-map-view/
-// https://docs.mapbox.com/mapbox-gl-js/example/data-driven-circle-colors/
-// 標區
-// https://docs.mapbox.com/mapbox-gl-js/example/data-join/
-// 標區＋legend
-// https://docs.mapbox.com/mapbox-gl-js/example/updating-choropleth/
+
 const stateMapping = {
-  100: '準備啟用中',
-  1: '啟用中',
-  98: '維修中',
-  99: '測試中',
+  100: 'stage',
+  1: 'on',
+  98: 'fix',
+  99: 'text',
 }
 
-const layerStyle = {
+const markLayerStyle = {
   'id': 'gostation_point',
   'source': 'point',
   'type': 'symbol',
@@ -33,17 +26,34 @@ const layerStyle = {
   }
 }
 
-// const StaionMarker = React.memo(({ arr }) => {
-//   return arr.map(station => (
-//     <Marker
-//       key={station.rid}
-//       latitude={station.latitude}
-//       longitude={station.longitude}
-//     >
-//       <img style={{ zIndex: 999, width: 30, height: 30 }} src={logoSVG} />
-//     </Marker>
-//   ))
-// })
+const cityLayerStyle = {
+  'id': 'city-layer',
+  'type': 'fill',
+  'source': 'states',
+  'paint': {
+    'fill-outline-color': {
+      'property': 'quadrant',
+      'stops': [
+        [0, 'rgb(255,255,255)'],
+        [1, 'rgb(13,157,3)'],
+        [2, 'rgb(250,51,51)'],
+        [3, 'rgb(255,172,68)'],
+        [4, 'rgb(250,234,51)']
+      ],
+    },
+    'fill-color': {
+      'property': 'quadrant',
+      'stops': [
+        [0, 'rgba(255,255,255, 0.3)'],
+        [1, 'rgba(13,157,3, 0.3)'],
+        [2, 'rgba(250,51,51, 0.3)'],
+        [3, 'rgba(255,172,68, 0.3)'],
+        [4, 'rgba(250,234,51, 0.3)']
+      ],
+    },
+    'fill-opacity': 0.5
+  }
+}
 
 const TaiwanMap = () => {
   const geoJson = {
@@ -59,6 +69,7 @@ const TaiwanMap = () => {
     minZoom: 8
   })
   const [stationGeoJson, setStationGeoJson] = useState(geoJson)
+  const [cityGeoJson, setCityGeoJson] = useState(geoJson)
   const [statistic, setStatistic] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [popupInfo, setPopupInfo] = useState(null)
@@ -74,9 +85,8 @@ const TaiwanMap = () => {
         throw Error('map load error')
       }
       if (!map.hasImage('go-station')) {
-        map.addImage('go-station', image, {alt:'logo'}, false)
+        map.addImage('go-station', image, { alt: 'logo' }, false)
       }
-      // img.src = logoSVG
     })
   }, [_mapRef])
 
@@ -100,23 +110,31 @@ const TaiwanMap = () => {
         state: stateMapping[dt.State],
         type: 'feature_gostation'
       }
-    }).filter(dt => dt.state === '啟用中')
+    }).filter(dt => dt.state === 'on')
   }
 
   useEffect(() => {
     const fetchData = async () => {
       let result = []
       let aggrData = []
+      let cityGeoLayer = {}
       try {
         const res = await axios.get('https://webapi.gogoro.com/api/vm/list')
         const twJson = await axios.get('taiwan_density.json')
+        const cityJson = await axios.get('https://raw.githubusercontent.com/g0v/twgeojson/master/json/twCounty2010.geo.json')
+
         const { data: cityData } = twJson
         const { data: stationGeoJson } = res
+        const { data: cityGeo } = cityJson
+        cityGeo.features = cityGeo.features.map(dt => ({
+          ...dt,
+          properties: { ...dt.properties, name: g0vCityMapping[dt.properties.name] }
+        }))
+        cityGeoLayer = Object.assign({}, cityGeo)
         // log data
         result = parseStationData(stationGeoJson)
         // aggr data
         const resultInGroup = countby(result, 'city_en')
-  
         aggrData = cityData.map(dt => {
           if (!resultInGroup[dt.city]) return {}
           const {
@@ -127,10 +145,10 @@ const TaiwanMap = () => {
             ...dt,
             station_density: station_count ? (station_count / dt.area) : 0,
             station_count,
-            station_ratio
+            station_ratio,
           }
         }).filter(dt => Object.values(dt).length > 0)
-  
+
       } catch (err) {
         console.log(err)
         alert('Something Went Wrong')
@@ -145,9 +163,38 @@ const TaiwanMap = () => {
         })
         )
       }
+
+      // use for feed to d3
+      const xMean = meanBy(aggrData, o => o.station_density)
+      const yMean = meanBy(aggrData, o => o.population_density)
+      const metricData = aggrData.map(dt => {
+        const quadrant = getQuadrantByMean(dt.station_density, dt.population_density, xMean, yMean)
+        return {
+          name: dt.city,
+          size: dt.station_count,
+          x: dt.station_density,
+          y: dt.population_density,
+          quadrant
+        }
+      })
+
+      const featuresWithQuadrant = cityGeoLayer.features.map(dt => {
+        let quadrant = 0
+        const filterData = metricData.filter(o => o.name == dt.properties.name)
+        if (filterData.length !== 0) quadrant = filterData[0]['quadrant']
+        return ({
+          ...dt,
+          properties: {
+            ...dt.properties,
+            quadrant
+          }
+        })
+      })
+      cityGeoLayer.features = featuresWithQuadrant
+
       setStationGeoJson(newGeo)
-      console.log(aggrData)
-      setStatistic(aggrData)
+      setCityGeoJson(cityGeoLayer)
+      setStatistic(metricData)
       setIsLoading(false)
     }
     fetchData()
@@ -157,30 +204,25 @@ const TaiwanMap = () => {
     const { features } = eve
     const hoveredFeature = features && features[0]
     setPopupInfo(null)
-    if(!hoveredFeature) return
+    if (!hoveredFeature) return
     const { properties } = hoveredFeature
     const hasInfo = properties && properties.type === 'feature_gostation'
-    if(!hasInfo) return 
+    if (!hasInfo) return
     setPopupInfo(properties)
-    // const currentFeature =   hoveredFeature
-    // ? {
-    //     feature: hoveredFeature,
-    //     x: offsetX,
-    //     y: offsetY
-    //   }
-    // : null
-    // console.log(currentFeature)
+  }
+
+  const onClick = (eve) => {
+    const { features } = eve
+    const hoveredFeature = features && features[0]
+    if (!hoveredFeature) return
+    const { properties, layer } = hoveredFeature
+    if (!layer) return
+    if (layer.id !== 'city-layer') return
+    console.log(properties.name)
   }
 
   return (
     <>
-      <Card style={CardStyle}>
-        <Skeleton loading={isLoading} paragraph={{ rows: 1 }}>
-          <Typography>總站數:
-              <span>{statistic.reduce((pre, cur) => pre + cur.station_count, 0)}</span>
-          </Typography>
-        </Skeleton>
-      </Card>
       {isLoading ? (<FullPageSpin />) :
         <MapGL
           ref={_mapRef}
@@ -190,30 +232,37 @@ const TaiwanMap = () => {
           mapStyle='mapbox://styles/yuningc0325/ckmnpe5yalnt817tfwbuf5yeu?optimize=true'
           onViewportChange={nextViewport => setViewport(nextViewport)}
           onHover={eve => onHover(eve)}
+          onClick={onClick}
+          interactiveLayerIds={['gostation_point', 'city-layer']}
         >
+          {/* taiwan layer on city  */}
+          <Source id='city_layer' type='geojson' data={cityGeoJson}>
+            <Layer {...cityLayerStyle} />
+          </Source>
           {/* {stationGeoJson.length > 0 ? <StaionMarker arr={stationGeoJson} /> : <></>} */}
           <Source id='station_mark' type='geojson' data={stationGeoJson}>
-            <Layer {...layerStyle} />
+            <Layer {...markLayerStyle} />
           </Source>
+
           <NavigationControl />
           {popupInfo &&
             <Popup
-            latitude={popupInfo.latitude}
-            longitude={popupInfo.longitude}
-            closeButton={false}
-            closeOnClick={false}
-            onClose={() => setPopupInfo(null)}
-            anchor="bottom"
-          >
-              <FlexBox 
+              latitude={popupInfo.latitude}
+              longitude={popupInfo.longitude}
+              closeButton={false}
+              closeOnClick={false}
+              onClose={() => setPopupInfo(null)}
+              anchor="bottom"
+            >
+              <FlexBox
                 justifyContent='center'
                 alignItems='flex-start'
-                flexDirection='column' 
-                width='auto' 
+                flexDirection='column'
+                width='auto'
                 height='100px' >
-                <div><span style={{fontWeight:'bold'}}>站名:</span> {popupInfo.locName}</div>
-                <div><span style={{fontWeight:'bold'}}>城市:</span> {popupInfo.city} | {popupInfo.district}</div>
-                <div><span style={{fontWeight:'bold'}}>地址:</span> {popupInfo.address}</div>
+                <div><span style={{ fontWeight: 'bold' }}>站名:</span> {popupInfo.locName}</div>
+                <div><span style={{ fontWeight: 'bold' }}>城市:</span> {popupInfo.city} | {popupInfo.district}</div>
+                <div><span style={{ fontWeight: 'bold' }}>地址:</span> {popupInfo.address}</div>
               </FlexBox>
             </Popup>
           }

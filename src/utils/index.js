@@ -19,3 +19,17 @@ export const countby = (arr=[], by='id') => {
   }))
   return groupBy(result, by)
 }
+
+export const getQuadrantByMean = (x, y, x_mean, y_mean) => {
+  if(x > x_mean && y > y_mean) {
+    return 1
+  } else if (x < x_mean && y > y_mean){
+    return 2
+  } else if (x < x_mean && y < y_mean){
+    return 3
+  } else if (x > x_mean && y < y_mean) {
+    return 4
+  } else {
+    return 0
+  }
+}
