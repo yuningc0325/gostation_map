@@ -1,13 +1,25 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import 'normalize.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './index.css'
+import 'normalize.css'
+import App from './App'
+import { Provider } from 'react-redux'
+import { createStore, applyMiddleware } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
+import thunk from 'redux-thunk'
+import reducer from './reducer'
+import reportWebVitals from './reportWebVitals'
+
+const env = process.env.NODE_ENV
+const middleware = env === 'production' ? applyMiddleware(thunk) : composeWithDevTools(applyMiddleware(thunk))
+const store = createStore(reducer, middleware)
+
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

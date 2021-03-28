@@ -7,7 +7,9 @@ import { g0vCityMapping } from '../../data/mapping'
 import axios from 'axios'
 import { meanBy } from 'lodash'
 import logoPng from '../../logo.png'
-
+import { connect } from 'react-redux'
+import { setIsLoading } from '../../reducer/controller'
+import { setStatistic, setCurrentCity } from '../../reducer/dashboard'
 
 const stateMapping = {
   100: 'stage',
@@ -55,7 +57,12 @@ const cityLayerStyle = {
   }
 }
 
-const TaiwanMap = () => {
+const TaiwanMap = (props) => {
+  const {
+    setIsLoading: _setIsLoading,
+    setStatistic: _setStatistic,
+    setCurrentCity: _setCurrentCity
+  } = props
   const geoJson = {
     type: 'FeatureCollection',
     features: []
@@ -196,6 +203,9 @@ const TaiwanMap = () => {
       setCityGeoJson(cityGeoLayer)
       setStatistic(metricData)
       setIsLoading(false)
+      // reducer set
+      _setIsLoading(false)
+      _setStatistic(metricData)
     }
     fetchData()
   }, [])
@@ -218,7 +228,8 @@ const TaiwanMap = () => {
     const { properties, layer } = hoveredFeature
     if (!layer) return
     if (layer.id !== 'city-layer') return
-    console.log(properties.name)
+    console.log(properties)
+    _setCurrentCity({value: properties.name, name: properties.COUNTYNAME})
   }
 
   return (
@@ -275,4 +286,4 @@ const TaiwanMap = () => {
 }
 
 
-export default TaiwanMap
+export default connect(null, { setIsLoading, setStatistic, setCurrentCity })(TaiwanMap)
