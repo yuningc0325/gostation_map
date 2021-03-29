@@ -22,3 +22,28 @@ export const g0vCityMapping = {
     "雲林縣": "Yunlin County",
     "連江縣": "Lienchiang County"
 }
+
+export const g0vCityMapping2 = {
+    "New Taipei City": "新北市",
+    "Taipei City": "台北市",
+    "Taoyuan City": "桃園縣",
+    "Taichung City": "台中市",
+    "Tainan City": "台南市",
+    "Kaohsiung City": "高雄市",
+    "Yilan County": "宜蘭縣",
+    "Hsinchu County": "新竹縣",
+    "Miaoli County": "苗栗縣",
+    "Changhua County": "彰化縣",
+    "Nantou County": "南投縣",
+    "Chiayi County": "嘉義縣",
+    "Pingtung County": "屏東縣",
+    "Taitung County": "台東縣",
+    "Hualien County": "花蓮縣",
+    "Penghu County": "澎湖縣",
+    "Keelung City": "基隆市",
+    "Hsinchu City": "新竹市",
+    "Chiayi City": "嘉義市",
+    "Kinmen County": "金門縣",
+    "Yunlin County": "雲林縣",
+    "Lienchiang County": "連江縣"
+}

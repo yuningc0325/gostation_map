@@ -5,10 +5,11 @@ import FixedWrapper from '../../styledComponent/FixedWrapper'
 import { createViewBox, getCustomedColor, clearViewBox } from '../../utils/d3-controller'
 import * as d3 from 'd3'
 import FlexBox from '../../styledComponent/FlexBox'
+import { setCurrentCity } from '../../reducer/dashboard'
 import { connect } from 'react-redux'
 
 const Info = props => {
-  const { Text } = Typography
+  const { Text, } = Typography
   const { city, dataset } = props
   if (dataset.length === 0 || !city) return <></>
 
@@ -28,7 +29,7 @@ const Info = props => {
 }
 
 const MetrixChart = props => {
-  const { dashboard } = props
+  const { dashboard,  setCurrentCity } = props
   const { statistic: dataset, currentCity } = dashboard
 
   const [d3View, setd3View] = useState(null)
@@ -119,13 +120,19 @@ const MetrixChart = props => {
       .attr('cy', d => yScale(d['y']))
       .attr('r', d => Math.log(d.size) * 3)
       .attr("fill", d => getCustomedColor(d.quadrant, d.name === currentCity.value))
-      .attr('stroke', 'currentBlack')
+      .attr('stroke', d => getCustomedColor(d.quadrant, d.name === currentCity.value))
+      .attr('style', 'cursor: pointer')
+      .on('click', (eve, d) => { 
+        eve.stopPropagation()
+        setCurrentCity(d.name)
+       })
+      
 
-  }, [d3View, dataset, currentCity.value])
+  }, [d3View, dataset, setCurrentCity, currentCity.value])
 
 
   return (
-    <FixedWrapper width='450px' height='400px' bottom={10} left={10}>
+    <FixedWrapper width='450px' height='400px' bottom={0} left={0}>
       <Card style={{ height: '450px', width: '500px' }}>
         <FlexBox flexDirection='column' width='100%' height='450px' alignItems='center' justifyContent='space-around'>
           <div sytle={{ height: '50px', width: '450px' }}>
@@ -170,4 +177,4 @@ MetrixChart.defaultProps = {
   ]
 }
 
-export default connect(({ dashboard }) => ({ dashboard }), null)(MetrixChart)
+export default connect(({ dashboard }) => ({ dashboard }), { setCurrentCity })(MetrixChart)

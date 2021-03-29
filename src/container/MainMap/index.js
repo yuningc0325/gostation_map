@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import MapGL, { Source, Layer, Popup, NavigationControl, FlyToInterpolator } from 'react-map-gl'
+import MapGL, { Source, Layer, Popup, FlyToInterpolator } from 'react-map-gl'
 import FlexBox from '../../styledComponent/FlexBox'
 import FullPageSpin from '../../component/FullPageSpin'
 import { getSecondItemFromArray, countby, getQuadrantByMean } from '../../utils'
@@ -46,11 +46,11 @@ const cityLayerStyle = {
     'fill-color': {
       'property': 'quadrant',
       'stops': [
-        [0, 'rgba(255,255,255, 0.3)'],
-        [1, 'rgba(13,157,3, 0.3)'],
-        [2, 'rgba(250,51,51, 0.3)'],
-        [3, 'rgba(255,172,68, 0.3)'],
-        [4, 'rgba(250,234,51, 0.3)']
+        [0, 'rgba(255,255,255, 0.7)'],
+        [1, 'rgba(13,157,3, 0.7)'],
+        [2, 'rgba(250,51,51, 0.7)'],
+        [3, 'rgba(255,172,68, 0.7)'],
+        [4, 'rgba(250,234,51, 0.7)']
       ],
     },
     'fill-opacity': 0.5
@@ -67,8 +67,8 @@ const TaiwanMap = (props) => {
     height: '100vh',
     latitude: 23.6978,
     longitude: 120.9605,
-    zoom: 8,
-    minZoom: 8
+    zoom: 7,
+    minZoom: 7
   })
   const [stationGeoJson, setStationGeoJson] = useState(geoJson)
   const [cityGeoJson, setCityGeoJson] = useState(geoJson)
@@ -223,13 +223,14 @@ const TaiwanMap = (props) => {
     const { properties, layer } = hoveredFeature
     if (!layer) return
     if (layer.id !== 'city-layer') return
-    props.setCurrentCity({ value: properties.name, name: properties.COUNTYNAME })
+    props.setCurrentCity(properties.name)
     setViewport({
       longitude: eve.lngLat[0],
       latitude: eve.lngLat[1],
-      zoom: 12,
+      zoom: 10,
       transitionInterpolator: new FlyToInterpolator({speed: 1.2}),
-      transitionDuration: 'auto'
+      transitionDuration: 'auto',
+      minZoom: 7
     })
   }
 
@@ -241,7 +242,8 @@ const TaiwanMap = (props) => {
           // controller={controller}
           {...viewport}
           mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-          mapStyle='mapbox://styles/mapbox/dark-v9'
+          // mapStyle='mapbox://styles/mapbox/dark-v9'
+          mapStyle="mapbox://styles/yuningc0325/ckmnpe5yalnt817tfwbuf5yeu"
           onViewportChange={nextViewport => setViewport(nextViewport)}
           onHover={eve => onHover(eve)}
           onClick={onClick}
@@ -256,7 +258,7 @@ const TaiwanMap = (props) => {
             <Layer {...markLayerStyle} />
           </Source>
 
-          <NavigationControl />
+          {/* <NavigationControl /> */}
           {popupInfo &&
             <Popup
               latitude={popupInfo.latitude}
